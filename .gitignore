@@ -38,3 +38,12 @@ out/
 
 ### Secure Environment ###
 application-env.properties
+
+### logs ###
+logs/
+
+### Docker ###
+docker/
+
+### generated ###
+**/generated/**
