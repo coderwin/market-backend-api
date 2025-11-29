@@ -35,7 +35,8 @@ logging:
     root: info
     org.springframework.web: debug
     org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.orm.jdbc.extract: trace
 
   file:
     name: logs/spring/app.log

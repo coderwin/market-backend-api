@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: allra
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update   # none / validate / update / create / create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+        dialect:  org.hibernate.dialect.H2Dialect
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
