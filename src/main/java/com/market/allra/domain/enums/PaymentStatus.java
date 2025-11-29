@@ -11,7 +11,6 @@ public enum PaymentStatus {
     , SUCCESS("결제성공")
     , FAILED("결제실패")
     , CANCELED("결제취소")
-    , REFUNDED("결제환불")
     ;
 
     private final String description;
