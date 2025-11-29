@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Setter;
+import org.hibernate.annotations.Comment;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ public class OrderProduct {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int quantity;
+    @Comment(value = "주문당시 가격(기록용)")
+    private int priceAtOrder;
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
