@@ -21,8 +21,6 @@ public class BasketProduct {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int quantity;
-    @Comment(value = "주문당시 가격(기록용)")
-    private int priceAtOrder;
     @CreatedDate
     private LocalDateTime createdAt;
 
