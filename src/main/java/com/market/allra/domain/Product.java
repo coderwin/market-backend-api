@@ -59,4 +59,10 @@ public class Product {
         this.status = status;
         this.category = category;
     }
+
+    /* 비즈니스 메서드 */
+
+    public boolean hasEnoughStock(int quantity) {
+        return stock - quantity >= 0;
+    }
 }

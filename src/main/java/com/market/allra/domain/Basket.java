@@ -10,11 +10,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "basket")
 @Comment(value = "장바구니 테이블")
@@ -28,6 +34,12 @@ public class Basket {
 
     @OneToMany(mappedBy = "basket", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<BasketProduct> basketProdcutList = new ArrayList<>();
+
+    @Builder
+    public Basket(Long id, Member member) {
+        this.id = id;
+        this.member = member;
+    }
 
     /* 비즈니스 로직 */
 
