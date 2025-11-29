@@ -24,6 +24,8 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false, length = 100)
+    private String transactionId;
     private int amount;
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
