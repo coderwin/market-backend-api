@@ -9,4 +9,6 @@ public interface BasketProductService {
     BasketProductResponseDTO addProductToBasket(Long basketId, Long memberId, AddBasketProductRequestDTO requestDTO);
 
     UpdateBasketProductResponseDTO updateProductToBasket(Long basketId, Long productId, Long memberId, UpdateBasketProductRequestDTO requestDTO);
+
+    void deleteProductToBasket(Long basketId, Long productId, Long memberId);
 }

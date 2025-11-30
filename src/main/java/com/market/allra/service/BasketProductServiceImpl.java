@@ -87,6 +87,28 @@ public class BasketProductServiceImpl implements BasketProductService {
         return UpdateBasketProductResponseDTO.create(findBasketProduct);
     }
 
+    @Transactional
+    @Override
+    public void deleteProductToBasket(Long basketId, Long productId, Long memberId) {
+        // 장바구니 찾기 with 회원id
+        Basket findBasket = basketRepository.findByIdAndMemberId(basketId, memberId).orElseThrow(
+                () -> new BusinessException(ErrorCode.BASKET_NOT_FOUND)
+        );
+
+        // 장바구니-상품 검색
+        BasketProduct findBasketProduct = basketProductRepository.findByBasketIdAndProductId(basketId, productId)
+                .orElse(null);
+
+        if(findBasketProduct == null) {
+            return;
+        }
+
+        // 연관관계 관련 메서드
+        findBasket.removeBasketProduct(findBasketProduct);
+        // 장바구니-상품 삭제
+        basketProductRepository.delete(findBasketProduct);
+    }
+
     private static BasketProduct getPresentBasketProductFromBasket(Basket findBasket, Product findProduct) {
         return findBasket.getBasketProdcutList().stream()
                 .filter((data) -> data.getProduct().getId().equals(findProduct.getId()))

@@ -49,4 +49,8 @@ public class Basket {
         basketProdcutList.add(basketProduct);
     }
 
+    public void removeBasketProduct(BasketProduct basketProduct) {
+        basketProdcutList.remove(basketProduct);
+        basketProduct.changeBasket(null);
+    }
 }

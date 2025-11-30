@@ -392,4 +392,98 @@ public class BasketProductServiceTest {
             assertThat(responseDTO.getBasketId()).isEqualTo((basket.getId()));
         }
     }
+
+    /// ////////////////////////////////// 장바구니-상품 삭제 테스트 ///////////////////////////////////////////////
+
+    @Nested
+    class DeleteProductToBasket {
+
+        @BeforeEach
+        void init() {
+            // 사용자 추가
+            nowMember = Member.builder().name("A").email("test1@test.com").password("1234!@#").address("서울특별시 관악구").build();
+            memberRepository.save(nowMember);
+
+            // 장바구니 추가(사용자의 장바구니 아님)
+            basket = Basket.builder().member(nowMember).build();
+            basketRepository.save(basket);
+
+            // 상품 추가
+            product = new Product("사과", 1000, 1, StockStatus.IN_STOCK, categoryFruit);
+            presentProduct = new Product("배", 1000, 10, StockStatus.IN_STOCK, categoryFruit);
+            categoryFruit = new Category("과일");
+
+            categoryFruit.addProduct(product);
+            categoryFruit.addProduct(presentProduct);
+            categoryRepository.save(categoryFruit);
+        }
+
+        @Test
+        public void 사용자의_장바구니_찾는_중_없으면_예외가_발생한다() {
+            // given
+            Long memberId = 999L;
+            Long basketId = 999L;
+            Long productId = 999L;
+
+            // when // then
+            BusinessException ex = Assertions.assertThrows(BusinessException.class, () -> {
+                basketProductService.deleteProductToBasket(basketId, productId, memberId);
+            });
+
+            // then
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.BASKET_NOT_FOUND);
+        }
+
+        @Test
+        public void 사용자의_장바구니_찾는_중_있으면_예외가_발생_안_한다() {
+            // given
+            int quantity = 1;
+            saveBasketProduct(quantity);
+
+            UpdateBasketProductRequestDTO requestDTO = UpdateBasketProductRequestDTO.of(quantity);
+
+            // when // then
+            Assertions.assertDoesNotThrow(() ->
+                    basketProductService.deleteProductToBasket(basket.getId(), product.getId(), nowMember.getId())
+            );
+
+            assertThat(basket.getMember().getId()).isEqualTo(nowMember.getId());
+        }
+
+        private BasketProduct saveBasketProduct(int quantity) {
+            BasketProduct basketProduct = BasketProduct.create(quantity, basket, product);
+            basketProductRepository.save(basketProduct);
+
+            return basketProduct;
+        }
+
+        @Test
+        public void 찾는_장바구니_상품이_없어도_삭제는_성공한다() {
+            // given
+            int quantity = 1;
+            saveBasketProduct(quantity);
+
+            // when // then
+            Long notPresentProductId = product.getId() + 10L;
+
+            basketProductService.deleteProductToBasket(basket.getId(), notPresentProductId, nowMember.getId());
+
+            // then
+            assertThat(basketProductRepository.findByBasketIdAndProductId(basket.getId(), notPresentProductId)).isEmpty();
+        }
+
+        @Test
+        public void 장바구니_내에_존재하는_상품이_삭제된다() {
+            // given
+            int quantity = 1;
+            BasketProduct basketProduct = saveBasketProduct(quantity);
+
+            // when
+            basketProductService.deleteProductToBasket(basket.getId(), product.getId(), nowMember.getId());
+
+            // then
+            assertThat(basket.getBasketProdcutList().contains(basketProduct)).isFalse();
+            assertThat(basketProductRepository.findById(basketProduct.getId())).isEmpty();
+        }
+    }
 }

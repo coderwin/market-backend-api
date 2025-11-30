@@ -64,6 +64,10 @@ public class BasketProduct {
     public void changeQuantity(int newQuantity) {
         quantity = newQuantity;
     }
+
+    public void changeBasket(Basket basket) {
+        this.basket = basket;
+    }
 }
 
 
