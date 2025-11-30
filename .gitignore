@@ -37,13 +37,13 @@ out/
 .vscode/
 
 ### Secure Environment ###
-application-env.properties
+#application-env.properties
 
 ### logs ###
 logs/
 
 ### Docker ###
-docker/
+#docker/
 
 ### generated ###
 **/generated/**
