@@ -9,12 +9,12 @@ import lombok.Getter;
  */
 @Getter
 public class BasketProductResponseDTO {
-    private Long id;
+    private Long basket_product_id;
     private int quantity;
 
     @Builder
-    public BasketProductResponseDTO(Long id, int quantity) {
-        this.id = id;
+    public BasketProductResponseDTO(Long basket_product_id, int quantity) {
+        this.basket_product_id = basket_product_id;
         this.quantity = quantity;
     }
 
@@ -22,7 +22,7 @@ public class BasketProductResponseDTO {
 
     public static BasketProductResponseDTO create(BasketProduct basketProduct) {
         return BasketProductResponseDTO.builder()
-                .id(basketProduct.getId())
+                .basket_product_id(basketProduct.getId())
                 .quantity(basketProduct.getQuantity())
                 .build();
     }
