@@ -12,6 +12,7 @@ import com.market.allra.web.dto.BasketProductResponseDTO;
 import com.market.allra.web.dto.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -21,6 +22,7 @@ public class BasketProductServiceImpl implements BasketProductService {
     private final ProductRepository productRepository;
     private final BasketProductRepository basketProductRepository;
 
+    @Transactional
     @Override
     public BasketProductResponseDTO addProductToBasket(Long basketId, Long memberId, AddBasketProductRequestDTO requestDTO) {
         // 사용자 장바구니 찾기
