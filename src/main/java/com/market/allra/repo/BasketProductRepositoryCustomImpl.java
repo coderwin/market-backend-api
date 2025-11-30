@@ -10,6 +10,7 @@ import java.util.List;
 
 import static com.market.allra.domain.QBasket.basket;
 import static com.market.allra.domain.QBasketProduct.basketProduct;
+import static com.market.allra.domain.QCategory.category;
 import static com.market.allra.domain.QProduct.product;
 
 @RequiredArgsConstructor
@@ -21,12 +22,14 @@ public class BasketProductRepositoryCustomImpl implements BasketProductRepositor
     public List<BasketProduct> findByBasketIdAndDeleteYn(Long basketId, YesNo deleteYn) {
         return query.select(basketProduct)
                 .from(basketProduct)
-                .join(basketProduct.basket, basket)
-                .join(basketProduct.product, product)
+                .join(basketProduct.basket, basket).fetchJoin()
+                .join(basketProduct.product, product).fetchJoin()
+                .join(product.category, category).fetchJoin()
                 .where(
                         basket.id.eq(basketId)
                         , product.deleteYN.eq(deleteYn)
                 )
+                .orderBy(basketProduct.id.desc())
                 .fetch();
     }
 }
