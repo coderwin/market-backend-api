@@ -38,7 +38,7 @@ Java Spring Boot 기반으로 구현한 전자 상거래(장바구니 · 상품 
 현재 실제 프로젝트 구조를 기반으로 작성되었습니다.
 
 ```
-
+```
 src/main/java
 └─ com.market.allra
 ├─ api                # Controller 계층
@@ -49,7 +49,7 @@ src/main/java
 └─ infra              # 외부 연동, Session 관리 등
 
 ```
-
+```
 ### 세부 패키지 구성
 
 #### 📌 `api`
@@ -69,7 +69,7 @@ src/main/java
 - Aggregate 단위로 패키지 분리
 
 ```
-
+```
 domain
 ├─ base                # BaseEntity, BaseTimeEntity
 ├─ basket              # Basket, BasketProduct
@@ -79,7 +79,7 @@ domain
 ├─ order               # Order, OrderItem
 ├─ product             # Product, Image, Stock
 ├─ repository          # JPA Repository 모음
-
+```
 ```
 
 #### 📌 `common`
@@ -129,7 +129,7 @@ domain
 테스트는 JUnit5 기반이며 기능 단위로 구성되어 있습니다.
 
 ```
-
+```
 src/test/java
 └─ com.market.allra
 ├─ api
@@ -137,6 +137,7 @@ src/test/java
 ├─ domain
 └─ LikeServiceTest.java
 
+````
 ````
 
 각 테스트는 다음을 검증합니다:
@@ -200,39 +201,4 @@ networks:
 
 ```
 docker compose up -d
-```
-
----
-
-## 🗺 향후 개선 예정
-
-* JWT 기반 인증 적용
-* Redis 세션 클러스터링
-* QueryDSL 기반 고도화된 검색
-* Kafka 기반 비동기 주문 처리
-* 테스트 커버리지 확대
-
----
-
-## 🧑‍💻 Author
-
-**이호진 (Backend Developer)**
-
-* GitHub: [https://github.com/coderwin](https://github.com/coderwin)
-* Email: [devlhj@naver.com](mailto:devlhj@naver.com)
-
-```
-
----
-
-# ✨ 다음 작업도 가능해요
-원하면 아래 항목들도 작성해줄게!
-
-- [ ] API 명세서 (표/Swagger 스타일)
-- [ ] ERD 다이어그램 생성
-- [ ] 패키지 의존성 그래프
-- [ ] 과제 제출용 요약 README
-- [ ] 기술 블로그 글 스타일 문서화
-
-원하는 추가 항목 있어?
 ```
