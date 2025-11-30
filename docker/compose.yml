@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: allar_db_mysql
+    environment:
+      TZ: Asia/Seoul  # 서버시간 설정
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    expose:
+      - 3306
+    ports:
+      - "3306:3306"
+    volumes:
+      - allra_mysql_data:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+    networks:
+      - allra_net
+    restart: unless-stopped
+
+volumes:
+  allra_mysql_data:
+
+networks:
+  allra_net:
+    driver: bridge
