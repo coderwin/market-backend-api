@@ -65,7 +65,6 @@ public class OrderServiceImpl implements OrderService{
         findBasket.getMember().addOrder(order);
         orderProductList.forEach(order::addOrderProduct);
 
-        // 주문 저장
         orderRepository.save(order);
 
         return order;

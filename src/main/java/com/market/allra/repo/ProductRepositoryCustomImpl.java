@@ -79,6 +79,25 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .execute();
     }
 
+    @Override
+    public void updateIncreaseStock(Long productId, int quantity) {
+        NumberExpression<Integer> newStock = product.stock.add(quantity);
+
+        query.update(product)
+                // 재고 변경
+                .set(product.stock, newStock)
+                // 재고 상태 변경
+                .set(
+                        product.status,
+                        new CaseBuilder()
+                                .when(newStock.goe(1))
+                                .then(StockStatus.IN_STOCK)
+                                .otherwise(product.status)
+                )
+                .where(product.id.eq(productId))
+                .execute();
+    }
+
     private static BooleanExpression priceLoe(Integer maxPrice) {
         return maxPrice != null ? product.price.loe(maxPrice) : null;
     }

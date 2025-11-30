@@ -62,7 +62,6 @@ public class Order {
     private List<Payment> paymentList = new ArrayList<>();
 
 
-
     /* 비즈니스 로직 */
 
     // 연관관계 편의 메서드
@@ -85,5 +84,9 @@ public class Order {
         order.totalPrice = totalPrice;
 
         return order;
+    }
+
+    public void changeStatus(OrderStatus status) {
+        this.status = status;
     }
 }
