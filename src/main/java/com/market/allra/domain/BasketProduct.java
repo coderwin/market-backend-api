@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,15 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "basket_product")
+@Table(
+        name = "basket_product"
+        , uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_basket_id_product_id"
+                        , columnNames = {"basket_id", "product_id"}
+                )
+        }
+)
 @Getter
 public class BasketProduct {
     @Id
