@@ -1,21 +1,33 @@
 # 지원자 이호진
 ---
-아래는 **현재 프로젝트 구조(src/main/java)**를 기반으로 깔끔하게 정리한
-✨ **GitHub용 README.md 초안**입니다.
-Spring Boot 전형적인 구조 + 실제 패키지들을 모두 반영해서 **바로 GitHub에 넣어도 되는 품질**로 작성했습니다.
 
-원하면 **ERD 추가**, **API 명세 자동 생성**, **배포용/과제 제출용 버전** 등으로 다시 커스터마이징도 가능해!
+```
+# ALLRA Backend 과제
+
+회원 가입/로그인, 상품 조회, 장바구니 관리, 주문 처리 등 핵심 비즈니스 로직을 포함하며,  
+업무 도메인에 따라 패키지를 분리하고 테스트 코드를 포함하여 유지보수성을 높였습니다.
 
 ---
 
-# 📘 README.md (제안본)
+## 🔧 실행 방법
 
-```markdown
-# ALLRA Backend
+### 1) 의존성 설치
 
-Java Spring Boot 기반으로 구현한 전자 상거래(장바구니 · 상품 · 주문) 백엔드 시스템입니다.  
-회원 가입/로그인, 상품 조회, 장바구니 관리, 주문 처리 등 핵심 비즈니스 로직을 포함하며,  
-업무 도메인에 따라 패키지를 분리하고 테스트 코드를 포함하여 유지보수성을 높였습니다.
+```
+./gradlew clean build
+```
+
+### 2) Spring Boot 실행
+
+```
+./gradlew bootRun
+```
+
+### 3) MySQL Docker 구동
+
+```
+docker compose up -d
+```
 
 ---
 
@@ -182,23 +194,3 @@ networks:
 ````
 
 ---
-
-## 🔧 실행 방법
-
-### 1) 의존성 설치
-
-```
-./gradlew clean build
-```
-
-### 2) Spring Boot 실행
-
-```
-./gradlew bootRun
-```
-
-### 3) MySQL Docker 구동
-
-```
-docker compose up -d
-```
