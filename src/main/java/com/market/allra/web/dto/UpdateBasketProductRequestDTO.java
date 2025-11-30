@@ -1,5 +1,6 @@
 package com.market.allra.web.dto;
 
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,6 +9,7 @@ import lombok.Getter;
  */
 @Getter
 public class UpdateBasketProductRequestDTO {
+    @Min(value = 1, message = "수량은 1개 이상이어야 합니다.")
     private int quantity;
 
     @Builder
