@@ -9,6 +9,7 @@ import com.market.allra.web.dto.response.ApiResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +27,7 @@ public class BasketProductController {
 
     @PostMapping
     public ResponseEntity<ApiResponseDTO<BasketProductResponseDTO>> addProductToBasket(
-            @RequestBody AddBasketProductRequestDTO requestDTO,
+            @RequestBody @Validated AddBasketProductRequestDTO requestDTO,
             @PathVariable Long basketId,
             @SessionAttribute(SessionKeys.LOGIN_MEMBER) LoginMemberResponseDTO loginMemberDTO
     ) {

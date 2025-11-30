@@ -25,10 +25,6 @@ public class BasketProductServiceImpl implements BasketProductService {
     @Transactional
     @Override
     public BasketProductResponseDTO addProductToBasket(Long basketId, Long memberId, AddBasketProductRequestDTO requestDTO) {
-        if(requestDTO.getQuantity() == 0) {
-            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
-        }
-
         // 사용자 장바구니 찾기
         Basket findBasket = basketRepository.findByIdAndMemberId(basketId, memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BASKET_NOT_FOUND));

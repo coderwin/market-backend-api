@@ -67,21 +67,6 @@ public class BasketProductServiceTest {
     }
 
     @Test
-    public void 요청_수량이_0_이면_예외가_발생한다() {
-        // given
-        int quantity = 0;
-        AddBasketProductRequestDTO requestDTO = AddBasketProductRequestDTO.of(product.getId(), quantity);
-
-        // when
-        BusinessException ex = Assertions.assertThrows(BusinessException.class, () -> {
-            basketProductService.addProductToBasket(basket.getId(), nowMember.getId(), requestDTO);
-        });
-
-        // then
-        assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
-    }
-
-    @Test
     public void 사용자의_장바구니_찾는_중_없으면_예외가_발생한다() {
         // given
         // 다른 사용자 추가
