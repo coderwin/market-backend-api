@@ -3,18 +3,24 @@ package com.market.allra.service;
 import com.market.allra.domain.Basket;
 import com.market.allra.domain.BasketProduct;
 import com.market.allra.domain.Product;
+import com.market.allra.domain.enums.YesNo;
 import com.market.allra.exception.BusinessException;
 import com.market.allra.repo.BasketProductRepository;
 import com.market.allra.repo.BasketRepository;
 import com.market.allra.repo.ProductRepository;
 import com.market.allra.web.dto.AddBasketProductRequestDTO;
 import com.market.allra.web.dto.BasketProductResponseDTO;
+import com.market.allra.web.dto.DetailBasketProductResponseDTO;
 import com.market.allra.web.dto.UpdateBasketProductRequestDTO;
 import com.market.allra.web.dto.UpdateBasketProductResponseDTO;
 import com.market.allra.web.dto.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor
 @Service
@@ -107,6 +113,21 @@ public class BasketProductServiceImpl implements BasketProductService {
         findBasket.removeBasketProduct(findBasketProduct);
         // 장바구니-상품 삭제
         basketProductRepository.delete(findBasketProduct);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<DetailBasketProductResponseDTO> search(Long basketId, Long memberId) {
+        // 장바구니 찾기 with 회원id
+        Basket findBasket = basketRepository.findByIdAndMemberId(basketId, memberId).orElseThrow(
+                () -> new BusinessException(ErrorCode.BASKET_NOT_FOUND)
+        );
+
+        List<BasketProduct> findBasketProductList = basketProductRepository.findByBasketIdAndDeleteYn(basketId, YesNo.N);
+
+        return findBasketProductList.stream()
+                .map(DetailBasketProductResponseDTO::create)
+                .collect(toList());
     }
 
     private static BasketProduct getPresentBasketProductFromBasket(Basket findBasket, Product findProduct) {

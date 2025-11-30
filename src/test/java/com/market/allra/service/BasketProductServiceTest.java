@@ -6,13 +6,16 @@ import com.market.allra.domain.Category;
 import com.market.allra.domain.Member;
 import com.market.allra.domain.Product;
 import com.market.allra.domain.enums.StockStatus;
+import com.market.allra.domain.enums.YesNo;
 import com.market.allra.exception.BusinessException;
 import com.market.allra.repo.BasketProductRepository;
 import com.market.allra.repo.BasketRepository;
 import com.market.allra.repo.CategoryRepository;
 import com.market.allra.repo.MemberRepository;
+import com.market.allra.repo.ProductRepository;
 import com.market.allra.web.dto.AddBasketProductRequestDTO;
 import com.market.allra.web.dto.BasketProductResponseDTO;
+import com.market.allra.web.dto.DetailBasketProductResponseDTO;
 import com.market.allra.web.dto.UpdateBasketProductRequestDTO;
 import com.market.allra.web.dto.UpdateBasketProductResponseDTO;
 import com.market.allra.web.dto.exception.ErrorCode;
@@ -24,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -486,4 +491,139 @@ public class BasketProductServiceTest {
             assertThat(basketProductRepository.findById(basketProduct.getId())).isEmpty();
         }
     }
+
+    @Nested
+    class SearchTest {
+
+        @Autowired
+        ProductRepository productRepository;
+
+        @BeforeEach
+        void init() {
+            // 사용자 추가
+            nowMember = Member.builder().name("A").email("test1@test.com").password("1234!@#").address("서울특별시 관악구").build();
+            memberRepository.save(nowMember);
+
+            // 장바구니 추가(사용자의 장바구니 아님)
+            basket = Basket.builder().member(nowMember).build();
+
+            // 상품 추가
+            product = new Product("사과", 1000, 1, StockStatus.IN_STOCK, categoryFruit);
+            Product product2 = new Product("배", 1000, 10, StockStatus.IN_STOCK, categoryFruit);
+            Product product3 = new Product("포도", 4000, 10, StockStatus.IN_STOCK, categoryFruit);
+            Product product4 = new Product("망고", 1000, 0, StockStatus.SOLD_OUT, categoryFruit);
+            Product product5 = new Product("토마토", 3000, 10, StockStatus.IN_STOCK, categoryFruit);
+            Product product6 = new Product("감", 10000, 0, StockStatus.SOLD_OUT, categoryFruit);
+            categoryFruit = new Category("과일");
+
+            categoryFruit.addProduct(product);
+            categoryFruit.addProduct(product2);
+            categoryFruit.addProduct(product3);
+            categoryFruit.addProduct(product4);
+            categoryFruit.addProduct(product5);
+            categoryFruit.addProduct(product6);
+            categoryRepository.save(categoryFruit);
+
+            // 장바구니-상품 추가
+            basket.addBasketProduct(getBasketProduct(1, basket, product));
+            basket.addBasketProduct(getBasketProduct(1, basket, product2));
+            basket.addBasketProduct(getBasketProduct(1, basket, product3));
+            basket.addBasketProduct(getBasketProduct(1, basket, product4));
+            basket.addBasketProduct(getBasketProduct(1, basket, product5));
+            basket.addBasketProduct(getBasketProduct(1, basket, product6));
+
+            basketRepository.save(basket);
+        }
+
+        @Test
+        public void 사용자의_장바구니_찾는_중_없으면_예외가_발생한다() {
+            // given
+            Long memberId = 999L;
+            Long basketId = 999L;
+
+            // when // then
+            BusinessException ex = Assertions.assertThrows(BusinessException.class, () -> {
+                basketProductService.search(basketId, memberId);
+            });
+
+            // then
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.BASKET_NOT_FOUND);
+        }
+
+        @Test
+        public void 사용자의_장바구니_찾는_중_있으면_예외가_발생_안_한다() {
+            // given
+
+            // when // then
+            Assertions.assertDoesNotThrow(() ->
+                    basketProductService.search(basket.getId(), nowMember.getId())
+            );
+
+            assertThat(basket.getMember().getId()).isEqualTo(nowMember.getId());
+        }
+
+        @Test
+        public void 장바구니_상품_조회시_품절이면_품절_상태가_표시된다() {
+            // given
+
+            // when
+            List<DetailBasketProductResponseDTO> detailBasketProductList = basketProductService.search(basket.getId(), nowMember.getId());
+
+            // then
+            DetailBasketProductResponseDTO detailBasketProductResponseDTO = detailBasketProductList.stream()
+                    .filter(data -> data.getProductResponseDTO()
+                            .getStatus()
+                            .equals(StockStatus.SOLD_OUT.getDescription()
+                            )
+                    )
+                    .findFirst()
+                    .orElseGet(null);
+
+            if(detailBasketProductResponseDTO != null) {
+                assertThat(detailBasketProductResponseDTO.getProductResponseDTO().getStatus()).isEqualTo("품절");
+            }
+        }
+
+        @Test
+        public void 삭제된_상품은_검색되지_않는다() {
+            // given
+            Product deletedProduct7 = new Product("바나나", 3000, 10, StockStatus.IN_STOCK, categoryFruit, YesNo.Y);
+            Product deletedProduct8 = new Product("수박", 10000, 0, StockStatus.SOLD_OUT, categoryFruit, YesNo.Y);
+            Product notDeletedProduct9 = new Product("오렌지", 10000, 0, StockStatus.SOLD_OUT, categoryFruit);
+
+            categoryFruit.addProduct(deletedProduct7);
+            categoryFruit.addProduct(deletedProduct8);
+            categoryFruit.addProduct(notDeletedProduct9);
+
+            productRepository.save(deletedProduct7);
+            productRepository.save(deletedProduct8);
+            productRepository.save(notDeletedProduct9);
+
+            basketProductRepository.save(getBasketProduct(1, basket, deletedProduct7));
+            basketProductRepository.save(getBasketProduct(1, basket, deletedProduct8));
+            basketProductRepository.save(getBasketProduct(1, basket, notDeletedProduct9));
+
+            // when
+            List<DetailBasketProductResponseDTO> detailBasketProductList = basketProductService.search(basket.getId(), nowMember.getId());
+
+            // then
+            assertThat(detailBasketProductList.size()).isEqualTo(7);
+        }
+
+        private BasketProduct getBasketProduct(int quantity, Basket basket, Product product) {
+            return BasketProduct.create(quantity, basket, product);
+        }
+
+
+
+
+
+
+
+
+
+
+    }
+
+
 }

@@ -60,6 +60,15 @@ public class Product {
         this.category = category;
     }
 
+    public Product(String name, int price, int stock, StockStatus status, Category category, YesNo deleteYN) {
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.status = status;
+        this.category = category;
+        this.deleteYN = deleteYN;
+    }
+
     /* 비즈니스 메서드 */
 
     public boolean hasEnoughStock(int quantity) {
