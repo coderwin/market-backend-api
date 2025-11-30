@@ -7,4 +7,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductRepositoryCustom {
     Page<Product> search(ProductSearchCond cond, Pageable pageable);
+
+    void updateDecreaseStock(Long productId, int quantity);
+
+    void updateIncreaseStock(Long productId, int quantity);
 }
