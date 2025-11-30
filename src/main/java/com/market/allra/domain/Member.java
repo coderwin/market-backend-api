@@ -52,13 +52,12 @@ public class Member {
     private List<Order> orderList = new ArrayList<>();
 
     @Builder
-    public Member(Long id, String name, String email, String password, String address, YesNo deleteYN) {
+    public Member(Long id, String name, String email, String password, String address) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.address = address;
-        this.deleteYN = deleteYN;
     }
 
     /* 비즈니스 로직 */
