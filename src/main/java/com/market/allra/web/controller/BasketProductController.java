@@ -3,6 +3,7 @@ package com.market.allra.web.controller;
 import com.market.allra.service.BasketProductService;
 import com.market.allra.web.dto.AddBasketProductRequestDTO;
 import com.market.allra.web.dto.BasketProductResponseDTO;
+import com.market.allra.web.dto.DetailBasketProductResponseDTO;
 import com.market.allra.web.dto.LoginMemberResponseDTO;
 import com.market.allra.web.dto.SessionKeys;
 import com.market.allra.web.dto.UpdateBasketProductRequestDTO;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
+
+import java.util.List;
 
 @RequestMapping("/api/v1/baskets/{basketId}/products")
 @RestController
@@ -66,6 +70,14 @@ public class BasketProductController {
         return ResponseEntity.ok(
                 ApiResponseDTO.success(null)
         );
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponseDTO<List<DetailBasketProductResponseDTO>>> search(
+            @PathVariable Long basketId
+            ,  @SessionAttribute(SessionKeys.LOGIN_MEMBER) LoginMemberResponseDTO loginMemberDTO
+    ) {
+        return ResponseEntity.ok(ApiResponseDTO.success(basketProductService.search(basketId, loginMemberDTO.getId())));
     }
 
 
