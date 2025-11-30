@@ -42,6 +42,12 @@ docker compose -f ./docker/compose.yml up --build -d
 2. 프로젝트 내 ./docker/init.sql 파일을 복사하여 쿼리를 실행시킵니다.
 ```
 
+### 5) 세션에 등록된 사용자 관련 정보
+---
+memberId: 1
+basketId: 1
+---
+
 ---
 
 ## 🚀 Tech Stack
