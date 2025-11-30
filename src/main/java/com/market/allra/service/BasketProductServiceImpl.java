@@ -9,6 +9,8 @@ import com.market.allra.repo.BasketRepository;
 import com.market.allra.repo.ProductRepository;
 import com.market.allra.web.dto.AddBasketProductRequestDTO;
 import com.market.allra.web.dto.BasketProductResponseDTO;
+import com.market.allra.web.dto.UpdateBasketProductRequestDTO;
+import com.market.allra.web.dto.UpdateBasketProductResponseDTO;
 import com.market.allra.web.dto.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -60,6 +62,29 @@ public class BasketProductServiceImpl implements BasketProductService {
         }
 
         return BasketProductResponseDTO.create(responseBasketProduct);
+    }
+
+    @Transactional
+    @Override
+    public UpdateBasketProductResponseDTO updateProductToBasket(Long basketId, Long productId, Long memberId, UpdateBasketProductRequestDTO requestDTO) {
+        // 장바구니 찾기 with 회원id
+        Basket findBasket = basketRepository.findByIdAndMemberId(basketId, memberId).orElseThrow(
+                () -> new BusinessException(ErrorCode.BASKET_NOT_FOUND)
+        );
+
+        // 요청 장바구니-상품이 존재하지 않으면 예외가 발생한다.
+        BasketProduct findBasketProduct = basketProductRepository.findByBasketIdAndProductId(basketId, productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BASKET_PRODUCT_NOT_FOUND));
+
+        // 수량 확인
+        if(!findBasketProduct.getProduct().hasEnoughStock(requestDTO.getQuantity())) {
+            throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+        }
+
+        // 장바구니_상품_수정
+        findBasketProduct.changeQuantity(requestDTO.getQuantity());
+
+        return UpdateBasketProductResponseDTO.create(findBasketProduct);
     }
 
     private static BasketProduct getPresentBasketProductFromBasket(Basket findBasket, Product findProduct) {
