@@ -43,10 +43,10 @@ docker compose -f ./docker/compose.yml up --build -d
 ```
 
 ### 5) 세션에 등록된 사용자 관련 정보
----
+```
 memberId: 1
 basketId: 1
----
+```
 
 ---
 
