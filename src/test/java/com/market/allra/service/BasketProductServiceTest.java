@@ -1,11 +1,13 @@
 package com.market.allra.service;
 
 import com.market.allra.domain.Basket;
+import com.market.allra.domain.BasketProduct;
 import com.market.allra.domain.Category;
 import com.market.allra.domain.Member;
 import com.market.allra.domain.Product;
 import com.market.allra.domain.enums.StockStatus;
 import com.market.allra.exception.BusinessException;
+import com.market.allra.repo.BasketProductRepository;
 import com.market.allra.repo.BasketRepository;
 import com.market.allra.repo.CategoryRepository;
 import com.market.allra.repo.MemberRepository;
@@ -35,11 +37,14 @@ public class BasketProductServiceTest {
     BasketProductService basketProductService;
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    private BasketProductRepository basketProductRepository;
 
     private Member nowMember;
     private Basket basket;
     private Category categoryFruit;
     private Product product;
+    private Product presentProduct;
 
     @BeforeEach
     void init() {
@@ -53,10 +58,27 @@ public class BasketProductServiceTest {
 
         // 상품 추가
         product = new Product("사과", 1000, 1, StockStatus.IN_STOCK, categoryFruit);
+        presentProduct = new Product("배", 1000, 10, StockStatus.IN_STOCK, categoryFruit);
         categoryFruit = new Category("과일");
 
         categoryFruit.addProduct(product);
+        categoryFruit.addProduct(presentProduct);
         categoryRepository.save(categoryFruit);
+    }
+
+    @Test
+    public void 요청_수량이_0_이면_예외가_발생한다() {
+        // given
+        int quantity = 0;
+        AddBasketProductRequestDTO requestDTO = AddBasketProductRequestDTO.of(product.getId(), quantity);
+
+        // when
+        BusinessException ex = Assertions.assertThrows(BusinessException.class, () -> {
+            basketProductService.addProductToBasket(basket.getId(), nowMember.getId(), requestDTO);
+        });
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     @Test
@@ -99,7 +121,7 @@ public class BasketProductServiceTest {
     public void 찾는_상품이_없으면_예외가_발생한다() {
         // given
         int quantity = 10;
-        long differentProductId = product.getId() + 1L;
+        long differentProductId = product.getId() + 10L;
         AddBasketProductRequestDTO requestDTO = AddBasketProductRequestDTO.of(differentProductId, quantity);
 
         // when // then
@@ -160,6 +182,53 @@ public class BasketProductServiceTest {
 
         // then
         Assertions.assertTrue(product.hasEnoughStock(quantity));
+    }
+
+    @Test
+    public void 장바구니에_같은_상품이_존재할_때_추가하려는_수량과_기존_수량의_합이_상품의_재고_수량을_넘으면_예외가_발생한다() {
+        // given
+        // 회원 바구니에 상품 추가
+        // 장바구니에 상품 등록
+        int presentQuantity = 5;
+        AddBasketProductRequestDTO previousRequestDTO = AddBasketProductRequestDTO.of(presentProduct.getId(), presentQuantity);
+
+        BasketProduct basketProduct = BasketProduct.create(previousRequestDTO.getQuantity(), basket, presentProduct);
+        basketProductRepository.save(basketProduct);
+
+        // when
+        // 같은 상품 또 추가
+        int quantity = 10;
+        AddBasketProductRequestDTO requestDTO = AddBasketProductRequestDTO.of(presentProduct.getId(), quantity);
+
+        BusinessException ex = Assertions.assertThrows(BusinessException.class, () -> basketProductService.addProductToBasket(basket.getId(), nowMember.getId(), requestDTO));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.PRODUCT_OUT_OF_STOCK);
+        assertThat(basketProduct.getQuantity() + quantity).isGreaterThan(presentProduct.getStock());
+    }
+
+    @Test
+    public void 장바구니에_같은_상품이_존재하면_기존_장바구니_상품에_수량을_더한다() {
+        // given
+        // 회원 바구니에 상품 추가
+        // 장바구니에 상품 등록
+        int presentQuantity = 5;
+        AddBasketProductRequestDTO previousRequestDTO = AddBasketProductRequestDTO.of(presentProduct.getId(), presentQuantity);
+
+        BasketProduct basketProduct = BasketProduct.create(previousRequestDTO.getQuantity(), basket, presentProduct);
+        basketProductRepository.save(basketProduct);
+
+        // when
+        // 같은 상품 또 추가
+        int quantity = 2;
+        AddBasketProductRequestDTO requestDTO = AddBasketProductRequestDTO.of(presentProduct.getId(), quantity);
+
+        BasketProductResponseDTO responseDTO = basketProductService.addProductToBasket(basket.getId(), nowMember.getId(), requestDTO);
+
+        // then
+        assertThat(basket.getBasketProdcutList().size()).isEqualTo(1);
+        assertThat(responseDTO.getQuantity()).isEqualTo(presentQuantity + quantity);
+        assertThat(responseDTO.getBasket_product_id()).isEqualTo(basketProduct.getId());
     }
 
     @Test

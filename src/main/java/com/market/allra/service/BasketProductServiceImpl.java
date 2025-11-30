@@ -25,6 +25,10 @@ public class BasketProductServiceImpl implements BasketProductService {
     @Transactional
     @Override
     public BasketProductResponseDTO addProductToBasket(Long basketId, Long memberId, AddBasketProductRequestDTO requestDTO) {
+        if(requestDTO.getQuantity() == 0) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
         // 사용자 장바구니 찾기
         Basket findBasket = basketRepository.findByIdAndMemberId(basketId, memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BASKET_NOT_FOUND));
@@ -34,15 +38,38 @@ public class BasketProductServiceImpl implements BasketProductService {
                 () -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND)
         );
 
+        // 기존 장바구니에 같은 상품이 있으면
+        BasketProduct presentBasketProduct = getPresentBasketProductFromBasket(findBasket, findProduct);
+
+        // 수량 생성
+        int newQuantity = presentBasketProduct == null
+                ? requestDTO.getQuantity()
+                : presentBasketProduct.getQuantity() + requestDTO.getQuantity();
+
         // 상품 재고 확인
-        if(!findProduct.hasEnoughStock(requestDTO.getQuantity())) {
+        if(!findProduct.hasEnoughStock(newQuantity)) {
             throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
-        // 장바구니에 상품 등록
-        BasketProduct basketProduct = BasketProduct.create(requestDTO.getQuantity(), findBasket, findProduct);
-        basketProductRepository.save(basketProduct);
+        // 장바구니-상품 존재 여부 확인
+        BasketProduct responseBasketProduct = null;
+        if(presentBasketProduct == null) {
+            responseBasketProduct = BasketProduct.create(requestDTO.getQuantity(), findBasket, findProduct);
+            // 결과값으로 basket_product_id를 보여주기 위해서 save 사용
+            // findBasket.addBasketProduct(responseBasketProduct);
+            basketProductRepository.save(responseBasketProduct);
+        } else {
+            presentBasketProduct.changeQuantity(newQuantity);
+            responseBasketProduct = presentBasketProduct;
+        }
 
-        return BasketProductResponseDTO.create(basketProduct);
+        return BasketProductResponseDTO.create(responseBasketProduct);
+    }
+
+    private static BasketProduct getPresentBasketProductFromBasket(Basket findBasket, Product findProduct) {
+        return findBasket.getBasketProdcutList().stream()
+                .filter((data) -> data.getProduct().getId().equals(findProduct.getId()))
+                .findFirst()
+                .orElse(null);
     }
 }

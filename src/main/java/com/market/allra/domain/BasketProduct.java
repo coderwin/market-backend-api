@@ -51,6 +51,10 @@ public class BasketProduct {
 
         return basketProduct;
     }
+
+    public void changeQuantity(int newQuantity) {
+        quantity = newQuantity;
+    }
 }
 
 
