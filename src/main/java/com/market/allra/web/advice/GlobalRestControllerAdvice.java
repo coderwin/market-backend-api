@@ -1,6 +1,8 @@
 package com.market.allra.web.advice;
 
+import com.market.allra.exception.BusinessException;
 import com.market.allra.web.dto.exception.ErrorCode;
+import com.market.allra.web.dto.response.ApiResponseDTO;
 import com.market.allra.web.dto.response.ErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalRestControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValidEx(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponseDTO<Void>> handleMethodArgumentNotValidEx(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String message = ex.getBindingResult().getAllErrors().stream()
                 .findFirst()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -33,11 +35,11 @@ public class GlobalRestControllerAdvice {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(response);
+                .body(ApiResponseDTO.failure(response));
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponseDTO> handleConstraintViolationEx(ConstraintViolationException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponseDTO<Void>> handleConstraintViolationEx(ConstraintViolationException ex, HttpServletRequest request) {
         String message = ex.getConstraintViolations().stream()
                 .findFirst()
                 .map(ConstraintViolation::getMessage)
@@ -51,12 +53,12 @@ public class GlobalRestControllerAdvice {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(response);
+                .body(ApiResponseDTO.failure(response));
 
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ErrorResponseDTO> handleException(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponseDTO<Void>> handleException(Exception ex, HttpServletRequest request) {
         ErrorResponseDTO response = ErrorResponseDTO.of(
                 ErrorCode.INTERNAL_SERVER_ERROR.getCode()
                 , ErrorCode.INTERNAL_SERVER_ERROR.getDefaultMessage()
@@ -65,6 +67,21 @@ public class GlobalRestControllerAdvice {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(response);
+                .body(ApiResponseDTO.failure(response));
+    }
+
+    @ExceptionHandler(value = BusinessException.class)
+    public ResponseEntity<ApiResponseDTO<Void>> handleBusinessEx(BusinessException ex, HttpServletRequest request) {
+        ErrorCode errorCode = ex.getErrorCode();
+
+        ErrorResponseDTO response = ErrorResponseDTO.of(
+                errorCode.getCode()
+                , ex.getMessage()
+                , errorCode.getHttpStatus().value()
+                , request.getRequestURI()
+        );
+
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(ApiResponseDTO.failure(response));
     }
 }

@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -17,7 +16,6 @@ import static com.market.allra.domain.QCategory.category;
 import static com.market.allra.domain.QProduct.product;
 
 @RequiredArgsConstructor
-@Repository
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
     private final JPAQueryFactory query;
@@ -26,7 +24,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     public Page<Product> search(ProductSearchCond cond, Pageable pageable) {
         // content 생성
         List<Product> contents = query.selectFrom(product)
-                .join(product.category, category)
+                .join(product.category, category).fetchJoin()
                 .where(
                         categoryIdEq(cond.getCategoryId())
                         , nameContains(cond.getKeyword())

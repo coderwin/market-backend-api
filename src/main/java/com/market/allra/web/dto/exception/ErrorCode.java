@@ -16,8 +16,10 @@ public enum ErrorCode {
     , BASKET_ACCESS_DENIED(HttpStatus.FORBIDDEN, "BASKET_ACCESS_DENIED", "해당 장바구니에 접근할 수 없습니다.")
     , BASKET_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "BASKET_ACCESS_DENIED", "상품 수량은 1 이상이어야 합니다.")
 
+    , PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "PRODUCT_NOT_FOUND", "상품을 찾을 수 없습니다.")
     , PRODUCT_OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "PRODUCT_OUT_OF_STOCK", "재고가 부족합니다.")
-    ;
+
+    , BASKET_PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "BASKET_PRODUCT_NOT_FOUND", "장바구니에 해당 상품이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
