@@ -2,7 +2,6 @@ package com.market.allra.web.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
-import org.springframework.web.ErrorResponse;
 
 /**
  * 응답 DTO
@@ -13,9 +12,9 @@ public class ApiResponseDTO<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final T data;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final ErrorResponse error;
+    private final ErrorResponseDTO error;
 
-    public ApiResponseDTO(boolean success, T data, ErrorResponse error) {
+    public ApiResponseDTO(boolean success, T data, ErrorResponseDTO error) {
         this.success = success;
         this.data = data;
         this.error = error;
@@ -26,7 +25,7 @@ public class ApiResponseDTO<T> {
         return new ApiResponseDTO<> (true, data, null);
     }
 
-    public static <T> ApiResponseDTO<T> failure(ErrorResponse error) {
+    public static <T> ApiResponseDTO<T> failure(ErrorResponseDTO error) {
         return new ApiResponseDTO<> (false, null, error);
     }
 }
