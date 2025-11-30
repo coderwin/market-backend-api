@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,19 @@ public class BasketProductController {
     ) {
         return ResponseEntity.ok(
                 ApiResponseDTO.success(basketProductService.updateProductToBasket(basketId, productId, loginMemberDTO.getId(), requestDTO))
+        );
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ApiResponseDTO<Void>> updateProductToBasket(
+            @PathVariable Long basketId
+            , @PathVariable Long productId
+            , @SessionAttribute(SessionKeys.LOGIN_MEMBER) LoginMemberResponseDTO loginMemberDTO
+    ) {
+        basketProductService.deleteProductToBasket(basketId, productId, loginMemberDTO.getId());
+
+        return ResponseEntity.ok(
+                ApiResponseDTO.success(null)
         );
     }
 
