@@ -1,9 +1,12 @@
 package com.market.allra.repo;
 
 import com.market.allra.domain.Product;
+import com.market.allra.domain.enums.StockStatus;
 import com.market.allra.domain.enums.YesNo;
 import com.market.allra.web.dto.cond.ProductSearchCond;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -55,6 +58,25 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
         // return PageImpl
         return new PageImpl<>(contents, pageable, totalCount);
+    }
+
+    @Override
+    public void updateDecreaseStock(Long productId, int quantity) {
+        NumberExpression<Integer> newStock = product.stock.add(-quantity);
+
+        query.update(product)
+                // 재고 변경
+                .set(product.stock, newStock)
+                // 재고 상태 변경
+                .set(
+                    product.status,
+                    new CaseBuilder()
+                            .when(newStock.loe(0))
+                            .then(StockStatus.SOLD_OUT)
+                            .otherwise(product.status)
+                )
+                .where(product.id.eq(productId))
+                .execute();
     }
 
     private static BooleanExpression priceLoe(Integer maxPrice) {
