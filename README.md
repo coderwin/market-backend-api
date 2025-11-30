@@ -27,8 +27,7 @@
 ### 3) MySQL Docker 구동
 - 프로젝트 최상위에서 실행
 
-```
-docker compose -f .\docker\compose.yml up --build -d
+```를 실행합니다.
 ```
 
 ---
