@@ -53,6 +53,10 @@ public class OrderServiceImpl implements OrderService{
                     return OrderProduct.create(basketProduct);
                 }).toList();
 
+        if(orderProductList.isEmpty()) {
+            throw new BusinessException(ErrorCode.ORDER_PRODUCT_NOT_CREATED);
+        }
+
         // 전체합
         int totalPrice = orderProductList.stream()
                 .mapToInt(OrderProduct::getTotalPrice)

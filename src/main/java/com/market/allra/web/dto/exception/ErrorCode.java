@@ -21,7 +21,8 @@ public enum ErrorCode {
 
     , BASKET_PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "BASKET_PRODUCT_NOT_FOUND", "장바구니에 해당 상품이 존재하지 않습니다.")
 
-    , ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST, "ORDER_NOT_FOUND", "주문이 존재하지 않습니다.");
+    , ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST, "ORDER_NOT_FOUND", "주문이 존재하지 않습니다.")
+    , ORDER_PRODUCT_NOT_CREATED(HttpStatus.BAD_REQUEST, "ORDER_PRODUCT_NOT_CREATED", "주문상품을 생성하지 못했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
