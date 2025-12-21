@@ -19,6 +19,7 @@ Mysql version: 8.0 (8.0.44)
 
 ### 1) MySQL Docker 구동
 - 프로젝트 최상위에서 실행
+- 초기 database 생성 및 ddl, insert 쿼리 실행
 ```
 docker compose -f ./docker/compose.yml up --build -d
 ```
@@ -33,13 +34,6 @@ docker compose -f ./docker/compose.yml up --build -d
 
 ```
 ./gradlew bootRun
-```
-
-### 4) DB 더미데이터 생성
-```
-1. DB에 접속합니다.
-   - 접속정보 파일 위치(./docker/.env)
-2. 프로젝트 내 ./docker/init.sql 파일을 복사하여 쿼리를 실행시킵니다.
 ```
 
 ### 5) 세션에 등록된 사용자 관련 정보
